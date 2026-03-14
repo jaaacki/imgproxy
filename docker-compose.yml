@@ -51,6 +51,7 @@ services:
       - IMGPROXY_USE_ETAG=true
       - IMGPROXY_ALLOWED_SOURCES=local://,http://,https://
       - IMGPROXY_LOG_LEVEL=info
+      - IMGPROXY_TIMEOUT=180
 
     # --- LOGGING ---
     # Prevents log files from growing indefinitely
