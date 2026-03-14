@@ -52,6 +52,7 @@ services:
       - IMGPROXY_ALLOWED_SOURCES=local://,http://,https://
       - IMGPROXY_LOG_LEVEL=info
       - IMGPROXY_TIMEOUT=180
+      - IMGPROXY_DOWNLOAD_TIMEOUT=120
 
     # --- LOGGING ---
     # Prevents log files from growing indefinitely
