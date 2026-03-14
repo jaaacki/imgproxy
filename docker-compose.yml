@@ -1,6 +1,6 @@
 services:
   imgproxy:
-    image: darthsim/imgproxy:v3.26.1
+    image: darthsim/imgproxy:v3.31.0
     container_name: imgproxy
     restart: unless-stopped
 
@@ -49,6 +49,7 @@ services:
       
       # Basic performance/logging settings
       - IMGPROXY_USE_ETAG=true
+      - IMGPROXY_ALLOWED_SOURCES=local://,http://,https://
       - IMGPROXY_LOG_LEVEL=info
 
     # --- LOGGING ---
