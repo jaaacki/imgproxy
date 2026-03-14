@@ -1,0 +1,75 @@
+services:
+  imgproxy:
+    image: darthsim/imgproxy:v3.26.1
+    container_name: imgproxy
+    restart: unless-stopped
+
+    # --- USER & PERMISSIONS ---
+    # Running as 1026:100 (noonoon:users)
+    user: "1026:100"
+
+    # --- NETWORK ---
+    networks:
+      - imgproxy-net
+    ports:
+      - "8080:8080"
+
+    # --- SECURITY HARDENING (PROCESS LEVEL) ---
+    # Gold standard: no-new-privileges:true
+    security_opt:
+      - no-new-privileges:true
+    
+    # Gold standard: Drop all Linux capabilities
+    cap_drop:
+      - ALL
+    
+    # Gold standard: Read-only root filesystem
+    read_only: true
+    
+    # Required for image processing when using read-only root FS
+    tmpfs:
+      - /tmp:size=512M,mode=1777
+
+    # --- LOCAL FOLDER BINDING ---
+    volumes:
+      - ./data/config:/config:ro
+      - ./data/assets:/assets:ro
+
+    # --- ENVIRONMENT CONFIGURATION ---
+    environment:
+      # Use a bindable address
+      - IMGPROXY_BIND=0.0.0.0:8080
+      
+      # Signed URLs are disabled for local use as requested
+      - IMGPROXY_KEY=
+      - IMGPROXY_SALT=
+      
+      # Map the local assets folder for access via imgproxy
+      - IMGPROXY_LOCAL_FILESYSTEM_ROOT=/assets
+      
+      # Basic performance/logging settings
+      - IMGPROXY_USE_ETAG=true
+      - IMGPROXY_LOG_LEVEL=info
+
+    # --- LOGGING ---
+    # Prevents log files from growing indefinitely
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # --- HEALTHCHECK ---
+    # Standard healthcheck to ensure the service is running
+    healthcheck:
+      test: ["CMD", "imgproxy", "health"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  # Gold standard: Explicitly named network
+  imgproxy-net:
+    name: imgproxy-net
+    driver: bridge
